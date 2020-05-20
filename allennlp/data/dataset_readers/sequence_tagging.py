@@ -18,7 +18,7 @@ DEFAULT_WORD_TAG_DELIMITER = "###"
 @DatasetReader.register("sequence_tagging")
 class SequenceTaggingDatasetReader(DatasetReader):
     """
-    Reads instances from a pretokenised file where each line is in the following format:
+    Reads instances from a pre-tokenized file where each line is in the following format:
 
     ```
     WORD###TAG [TAB] WORD###TAG [TAB] ..... \n
@@ -39,7 +39,7 @@ class SequenceTaggingDatasetReader(DatasetReader):
     token_indexers : `Dict[str, TokenIndexer]`, optional (default=`{"tokens": SingleIdTokenIndexer()}`)
         We use this to define the input representation for the text.  See :class:`TokenIndexer`.
         Note that the `output` tags will always correspond to single token IDs based on how they
-        are pre-tokenised in the data file.
+        are pre-tokenized in the data file.
     """
 
     def __init__(
