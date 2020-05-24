@@ -1,31 +1,55 @@
 import logging
 
-import jsonpickle
 import sys
+import io
 from typing import Optional
 
 import dill
+from allennlp.data import Token
 
 from torch.utils.data import Dataset
 
 from allennlp.data.instance import Instance
-from allennlp.data.fields import Field, SequenceField, SequenceLabelField, TextField
+from allennlp.data.fields import Field, SequenceField, SequenceLabelField, TextField, ArrayField, FlagField, IndexField, \
+    ListField, MetadataField, SpanField
 from allennlp.data.vocabulary import Vocabulary
 from allennlp.data.dataset_readers.dataset_reader import DatasetReader
 
 logger = logging.getLogger(__name__)
 
 
-_pickle_exceptions = [Instance, TextField, SequenceField, SequenceLabelField, Field]  # TODO: Add more exceptions
+_pickle_exceptions = [
+    Instance,
+    TextField,
+    SequenceField,
+    SequenceLabelField,
+    Field,
+    ArrayField,
+    FlagField,
+    IndexField,
+    ListField,
+    MetadataField,
+    SpanField,
+    Token
+]  # TODO: Add more exceptions
 _pickle_exception_ids = [id(o) for o in _pickle_exceptions]
 
 
 class _Pickler(dill.Pickler):
     def persistent_id(self, obj):
+        global _pickle_exceptions
+        global _pickle_exception_ids
         try:
             return _pickle_exception_ids.index(id(obj))
         except ValueError:
-            return None
+            from allennlp.data import TokenIndexer
+            if isinstance(obj, TokenIndexer):
+                result = len(_pickle_exceptions)
+                _pickle_exceptions.append(obj)
+                _pickle_exception_ids.append(id(obj))
+                return result
+            else:
+                return None
 
 
 class _Unpickler(dill.Unpickler):
@@ -42,12 +66,8 @@ class OOCDataset(Dataset):
     """
     def __init__(
         self,
-        instance_serializer = jsonpickle.dumps,
-        instance_deserializer = jsonpickle.loads,
         vocab: Vocabulary = None
     ):
-        self.instance_serializer = instance_serializer
-        self.instance_deserializer = instance_deserializer
         self.vocab = vocab
 
         import threading
@@ -91,8 +111,6 @@ class OOCDataset(Dataset):
     def __setitem__(self, key, value):
         self._check_error()
         key = key.to_bytes(4, byteorder=sys.byteorder)
-        value = self.instance_serializer(value)
-        import io
         with io.BytesIO() as buffer:
             pickler = _Pickler(buffer)
             pickler.dump(value)
@@ -101,22 +119,22 @@ class OOCDataset(Dataset):
         self.write_event.set()
 
     def __getitem__(self, key: int):
-        key = key.to_bytes(4, byteorder=sys.byteorder)
-        import io
+        key_bytes = key.to_bytes(4, byteorder=sys.byteorder)
         while True:
+            if self.len is not None and key >= self.len:
+                raise IndexError
             self._check_error()
             with self.lmdb_env.begin(buffers=True) as read_txn:
-                r = read_txn.get(key, default=None)
+                r = read_txn.get(key_bytes, default=None)
                 if r is not None:
                     unpickler = _Unpickler(io.BytesIO(r))
                     r = unpickler.load()
-                    break
+                    return r
             flag = self.write_event.wait(30)
             if flag:
                 self.write_event.clear()
             else:
-                logger.info("Waited more than 30 seconds for a write to OOCDataset. Continuing to wait.")
-        return self.instance_deserializer(r)
+                logger.info("Waited more than 30 seconds for a write to OOCDataset(%d). Continuing to wait.", key)
 
     def set_length(self, len: int) -> None:
         with self.lock:
