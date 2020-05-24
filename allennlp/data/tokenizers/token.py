@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, astuple
 from typing import Optional
 
 
@@ -56,6 +56,18 @@ class Token:
 
     def __repr__(self):
         return self.__str__()
+
+    def __getstate__(self):
+        if all(x is None for x in [self.lemma_, self.pos_, self.tag_, self.dep_, self.ent_type_]):
+            return self.text, self.idx, self.idx_end, self.text_id, self.type_id
+        return astuple(self)
+
+    def __setstate__(self, state):
+        if len(state) == 5:
+            self.text, self.idx, self.idx_end, self.text_id, self.type_id = state
+        else:
+            for field, value in zip(self.__dataclass_fields__.keys(), state):
+                self.__setattr__(field, value)
 
 
 def show_token(token: Token) -> str:
