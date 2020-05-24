@@ -48,11 +48,13 @@ setup(
     author="Allen Institute for Artificial Intelligence",
     author_email="allennlp@allenai.org",
     license="Apache",
-    packages=find_packages(exclude=["*.tests", "*.tests.*", "tests.*", "tests"]),
+    packages=find_packages(
+        exclude=["*.tests", "*.tests.*", "tests.*", "tests", "test_fixtures", "test_fixtures.*"]
+    ),
     install_requires=[
         "torch>=1.5.0,<1.6.0",
         "jsonnet>=0.10.0 ; sys.platform != 'win32'",
-        "overrides==2.8.0",
+        "overrides==3.0.0",
         "nltk",
         "spacy>=2.1.0,<2.3",
         "numpy",

@@ -157,10 +157,10 @@ class DatasetReader(Registrable):
 
     # Parameters
 
-    lazy : `bool`, optional (default=False)
+    lazy : `bool`, optional (default=`False`)
         If this is true, `instances()` will return an object whose `__iter__` method
         reloads the dataset each time it's called. Otherwise, `instances()` returns a list.
-    cache_directory : `str`, optional (default=None)
+    cache_directory : `str`, optional (default=`None`)
         If given, we will use this directory to store a cache of already-processed `Instances` in
         every file passed to :func:`read`, serialized (by default, though you can override this) as
         one string-formatted `Instance` per line.  If the cache file for a given `file_path` exists,
@@ -172,10 +172,10 @@ class DatasetReader(Registrable):
         unique for any combination of code and parameters that you use.  That is, if you pass a
         directory here, we will use any existing cache files in that directory _regardless of the
         parameters you set for this DatasetReader!_
-    max_instances : `int`, optional (default=None)
+    max_instances : `int`, optional (default=`None`)
         If given, will stop reading after this many instances. This is a useful setting for debugging.
         Setting this disables caching.
-    manual_distributed_sharding: `bool`, optional (default=False)
+    manual_distributed_sharding: `bool`, optional (default=`False`)
         By default, when used in a distributed setting, `DatasetReader` makes sure that each
         worker process only receives a subset of the data. It does this by reading the whole
         dataset in each worker, but filtering out the instances that are not needed. If you
@@ -258,6 +258,11 @@ class DatasetReader(Registrable):
             if not self.manual_distributed_sharding and util.is_distributed():
                 from torch import distributed
 
+                logger.info(
+                    "Returning instances i%%%d==%d",
+                    distributed.get_world_size(),
+                    distributed.get_rank(),
+                )
                 instances = itertools.islice(
                     instances, distributed.get_rank(), None, distributed.get_world_size()
                 )
