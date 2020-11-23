@@ -455,9 +455,7 @@ class VQAv2Reader(DatasetReader):
         questions = []
         with open(cached_path(split.questions, extract_archive=True)) as f:
             questions_file = json.load(f)
-        image_subtype = questions_file["data_subtype"]
         for ques in questions_file["questions"]:
-            ques["image_subtype"] = image_subtype
             questions.append(ques)
         questions = questions[question_slice]
 
@@ -469,7 +467,7 @@ class VQAv2Reader(DatasetReader):
             # that needs processing, and then processes them all.
             processed_images = self._process_image_paths(
                 self.images[
-                    f"COCO_{question_dict['image_subtype']}_{question_dict['image_id']:012d}.jpg"
+                    f"{question_dict['image_id']:012d}.jpg"
                 ]
                 for question_dict in question_dicts
             )
