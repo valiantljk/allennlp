@@ -18,10 +18,10 @@ local vocabulary = if construct_vocab then {
   "dataset_reader": {
     "type": "vqav2",
     "image_dir": "/mnt/tank/dirkg/data/vision/vqa/balanced_real",
-    "feature_cache_dir": "/mnt/tank/dirkg/data/vision/balanced_real/feature_cache",
+    "feature_cache_dir": "/mnt/tank/dirkg/data/vision/balanced_real/feature_cache_detectron",
     #"image_dir": "/Users/dirkg/Documents/data/vision/vqa/balanced_real",
-    #"feature_cache_dir": "/Users/dirkg/Documents/data/vision/vqa/balanced_real/feature_cache",
-    "image_loader": "torch",
+    #"feature_cache_dir": "/Users/dirkg/Documents/data/vision/vqa/balanced_real/feature_cache_detectron",
+    "image_loader": "detectron",
     "image_featurizer": "resnet_backbone",
     "region_detector": "faster_rcnn",
     "tokenizer": {
@@ -49,7 +49,7 @@ local vocabulary = if construct_vocab then {
   "model": {
     "type": "vqa_vilbert_from_huggingface",
     "model_name": model_name,
-    "image_feature_dim": 1024,
+    "image_feature_dim": 2048,
     "image_hidden_size": 1024,
     "image_num_attention_heads": 8,
     "image_num_hidden_layers": 6,
