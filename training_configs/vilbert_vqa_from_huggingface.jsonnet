@@ -1,6 +1,6 @@
 local model_name = "bert-large-uncased";
 local effective_batch_size = 128;
-local gpu_batch_size = 16;
+local gpu_batch_size = 32;
 local num_gpus = 1;
 
 local construct_vocab = false;
@@ -70,7 +70,7 @@ local vocabulary = if construct_vocab then {
   "data_loader": {
     "batch_size": gpu_batch_size,
     "shuffle": true,
-    [if !construct_vocab then "max_instances_in_memory"]: 1024
+    //[if !construct_vocab then "max_instances_in_memory"]: 1024
   },
   [if num_gpus > 1 then "distributed"]: {
     "cuda_devices": std.range(0, num_gpus - 1)
@@ -80,12 +80,12 @@ local vocabulary = if construct_vocab then {
   [if !construct_vocab then "trainer"]: {
     "optimizer": {
       "type": "huggingface_adamw",
-      "lr": 4e-4,
+      "lr": 4e-5,
       "correct_bias": true,
       "weight_decay": 0.01,
       "parameter_groups": [
         // [["bias", "LayerNorm\\.weight", "layer_norm\\.weight"], {"weight_decay": 0}], // can't use both at the same time
-        [["^embeddings\\.", "^encoder.layers1\\.", "^t_pooler\\."], {"lr": 4e-5}]
+        [["^embeddings\\.", "^encoder.layers1\\.", "^t_pooler\\."], {"lr": 4e-6}]
       ],
     },
     "learning_rate_scheduler": {
@@ -102,7 +102,7 @@ local vocabulary = if construct_vocab then {
         "should_log_learning_rate": true
     },
   },
-  "random_seed": 42,
-  "numpy_seed": 42,
-  "pytorch_seed": 42,
+  "random_seed": 876170670,
+  "numpy_seed": 876170670,
+  "pytorch_seed": 876170670,
 }
