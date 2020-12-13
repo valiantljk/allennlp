@@ -80,13 +80,14 @@ class VqaVilbert(VisionTextModel):
         self,  # type: ignore
         box_features: torch.Tensor,
         box_coordinates: torch.Tensor,
+        box_mask: torch.Tensor,
         question: TextFieldTensors,
         labels: Optional[torch.Tensor] = None,
         label_weights: Optional[torch.Tensor] = None,
     ) -> Dict[str, torch.Tensor]:
 
         return super().forward(
-            box_features, box_coordinates, text=question, label=labels, label_weights=label_weights
+            box_features, box_coordinates, box_mask, text=question, label=labels, label_weights=label_weights
         )
 
     @overrides
