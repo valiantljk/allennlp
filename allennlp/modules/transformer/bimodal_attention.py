@@ -113,7 +113,13 @@ class BiModalAttention(TransformerModule, FromParams):
 
     @staticmethod
     def _apply_mask(values: torch.FloatTensor, mask: torch.BoolTensor) -> torch.FloatTensor:
-        mask = (~mask) * -10e5
+        if len(mask.shape) == 2:
+            # We create a 4D attention mask from a 2D tensor mask.
+            # The shape is `batch_size x 1 x 1 x target_seq_len` which is broadcast
+            # to `batch_size x num_attention_heads x source_seq_len x target_seq_len`
+            mask = mask.unsqueeze(1).unsqueeze(2)
+        # `mask==1` to convert float tensors.
+        mask = (~(mask == 1)) * -10e5
         return values + mask
 
     def forward(
@@ -137,9 +143,9 @@ class BiModalAttention(TransformerModule, FromParams):
             when the modality is text, or the number of
             regions when the modality is image.
         attention_mask1 : `torch.BoolTensor`, optional
-            Shape `batch_size x seq_len`
+            Shape `batch_size x seq_len1`
         attention_mask : `torch.BoolTensor`, optional
-            Shape `batch_size x seq_len`
+            Shape `batch_size x seq_len2`
         co_attention_mask : `torch.Tensor`, optional
             Shape `batch_size x seq_len1 x seq_len2 x all_head_size`
             This mask is for cases when you already have some prior information
