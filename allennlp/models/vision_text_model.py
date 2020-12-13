@@ -178,6 +178,7 @@ class VisionTextModel(Model):
         self,  # type: ignore
         box_features: torch.Tensor,
         box_coordinates: torch.Tensor,
+        box_mask: torch.Tensor,
         text: TextFieldTensors,
         label: Optional[torch.Tensor] = None,
         label_weights: Optional[torch.Tensor] = None,
@@ -215,7 +216,7 @@ class VisionTextModel(Model):
 
         # All batch instances will always have the same number of images and boxes, so no masking
         # is necessary, and this is just a tensor of ones.
-        image_attention_mask = torch.ones_like(box_coordinates[:, :, 0])
+        image_attention_mask = box_mask
 
         # (batch_size, num_tokens, embedding_dim)
         embedding_output = self.embeddings(token_ids, token_type_ids)
