@@ -1,5 +1,6 @@
 import logging
 from collections import Counter
+from functools import lru_cache
 from os import PathLike
 from typing import (
     Dict,
@@ -221,6 +222,7 @@ def process_digit_article(input: str) -> str:
     return " ".join(output)
 
 
+@lru_cache(maxsize=None)
 def preprocess_answer(answer: str) -> str:
     answer = process_digit_article(process_punctuation(answer))
     answer = answer.replace(",", "")
