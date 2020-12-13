@@ -199,7 +199,7 @@ punct = [
 def process_punctuation(inText: str) -> str:
     outText = inText
     for p in punct:
-        if (p + " " in inText or " " + p in inText) or (re.search(comma_strip, inText) is not None):
+        if (p + " " in inText or " " + p in inText) or (comma_strip.search(inText) is not None):
             outText = outText.replace(p, "")
         else:
             outText = outText.replace(p, " ")
