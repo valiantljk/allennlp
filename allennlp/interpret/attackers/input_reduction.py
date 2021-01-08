@@ -87,7 +87,7 @@ class InputReduction(Attacker):
         candidates = [(instance, -1, tag_mask)]
         # keep removing tokens until prediction is about to change
         while len(current_tokens) > num_ignore_tokens and candidates:
-            logger.info("Reducing input, %d tokens left", len(current_tokens))
+            print(f"Reducing input, {len(current_tokens)} tokens left")
 
             # sort current candidates by smallest length (we want to remove as many tokens as possible)
             def get_length(input_instance: Instance):
