@@ -1,3 +1,4 @@
+import logging
 from copy import deepcopy
 from typing import List, Tuple
 import heapq
@@ -11,6 +12,8 @@ from allennlp.data.fields import TextField, SequenceLabelField
 from allennlp.interpret.attackers import utils
 from allennlp.interpret.attackers.attacker import Attacker
 from allennlp.predictors import Predictor
+
+logger = logging.getLogger(__name__)
 
 
 @Attacker.register("input-reduction")
@@ -84,6 +87,8 @@ class InputReduction(Attacker):
         candidates = [(instance, -1, tag_mask)]
         # keep removing tokens until prediction is about to change
         while len(current_tokens) > num_ignore_tokens and candidates:
+            logger.info("Reducing input, %d tokens left", len(current_tokens))
+
             # sort current candidates by smallest length (we want to remove as many tokens as possible)
             def get_length(input_instance: Instance):
                 input_text_field: TextField = input_instance[input_field_to_attack]  # type: ignore
