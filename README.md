@@ -51,7 +51,7 @@
     - [Installing using Docker](#installing-using-docker)
     - [Installing from source](#installing-from-source)
 - [Running AllenNLP](#running-allennlp)
-- [Running AllenNLP with Ray] (#running-allennlp-with-ray)
+- [Running AllenNLP with Ray](#running-allennlp-with-ray)
 - [Issues](#issues)
 - [Contributions](#contributions)
 - [Citing](#citing)
