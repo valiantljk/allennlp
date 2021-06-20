@@ -51,6 +51,7 @@
     - [Installing using Docker](#installing-using-docker)
     - [Installing from source](#installing-from-source)
 - [Running AllenNLP](#running-allennlp)
+- [Running AllenNLP with Ray] (#allennlp-on-ray)
 - [Issues](#issues)
 - [Contributions](#contributions)
 - [Citing](#citing)
@@ -303,6 +304,11 @@ with the `allennlp` command (whether you installed from `pip` or from source).
 To see the full usage information, run `allennlp --help`.
 
 You can test your installation by running  `allennlp test-install`.
+
+
+## Running AllenNLP with Ray
+
+TODO
 
 ## Issues
 
